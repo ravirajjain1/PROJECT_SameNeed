@@ -1,4 +1,4 @@
-**SameNeed — A Community Service Pooling Platform**
+#SameNeed — A Community Service Pooling Platform
 
 ## Background
 
