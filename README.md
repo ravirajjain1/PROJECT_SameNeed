@@ -658,21 +658,21 @@ Restart Tomcat and verify that persistent data is still available.
 
 ### Login Page
 
-![SameNeed Login](SameNeed/screenshots/login.png)
+![SameNeed Login](screenshots/login.png)
 
 ### Register Page
 
-![SameNeed User Registration](SameNeed/screenshots/user_register.png)
-![SameNeed Service Provider Registration](SameNeed/screenshots/provider_register.png)
+![SameNeed User Registration](screenshots/user_register.png)
+![SameNeed Service Provider Registration](screenshots/provider_register.png)
 
 ### User Dashboard
 
-![SameNeed User Dashboard](SameNeed/screenshots/user_dashboard1.png)
-![SameNeed User Dashboard](SameNeed/screenshots/user_dashboard2.png)
-![SameNeed User Dashboard](SameNeed/screenshots/user_dashboard3.png)
-![SameNeed User Dashboard](SameNeed/screenshots/user_dashboard4.png)
+![SameNeed User Dashboard](screenshots/user_dashboard1.png)
+![SameNeed User Dashboard](screenshots/user_dashboard2.png)
+![SameNeed User Dashboard](screenshots/user_dashboard3.png)
+![SameNeed User Dashboard](screenshots/user_dashboard4.png)
 
 ### Service Provider Dashboard
 
-![SameNeed Service Provider Dashboard](SameNeed/screenshots/provider_dashboard1.png)
+![SameNeed Service Provider Dashboard](screenshots/provider_dashboard1.png)
 
