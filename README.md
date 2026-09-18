@@ -1,4 +1,4 @@
-# SameNeed
+# SameNeed - A Collective Platform for Local Service Requests
 
 A Java web application that helps people who need the same local service come together, form a group, and collectively coordinate and negotiate with a service provider for a shared visit.
 
