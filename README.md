@@ -1,10 +1,87 @@
 # SameNeed
 
-A Java web application that lets multiple customers with the same service need pool together into a group and collectively negotiate with a service provider for a shared visit.
+A Java web application that helps people who need the same local service come together, form a group, and collectively coordinate and negotiate with a service provider for a shared visit.
 
 ## Overview
 
-SameNeed addresses a common problem: when several people in a locality need the same service (e.g., washing machine repair), each pays a solo call-out fee. The platform lets those customers find each other, form a group for a single visit, and negotiate a per-member price with a verified provider — reducing cost for customers and increasing job value for providers.
+SameNeed solves a simple but common problem: when multiple people in the same area need the same service, such as washing machine repair, each person usually has to arrange a separate service visit and may pay the full visit or service charge individually.
+
+SameNeed allows customers with the same service requirement, even if their individual problems are different, to discover each other and form a group. Once a group is formed, they can communicate through a private group chat, connect with a suitable service provider, and negotiate a group-based price for servicing multiple customers in a single visit.
+
+For example, one customer may have a washing machine that is not draining, while another has a leakage problem. Their problems are different, but both need washing machine repair, so they can be part of the same group.
+
+The platform is designed to make local service coordination more organized and give customers an opportunity to negotiate collectively, while allowing service providers to handle multiple nearby service requests more efficiently.
+
+
+## Features
+
+### Customer Features
+
+* User registration and secure login
+* Create and manage service requests
+* Browse and search open service requests
+* Find customers looking for the same service
+* Join and leave service groups
+* Anonymous member identities during group formation
+* Real-time group chat using WebSocket
+* View provider offers
+* Participate in group price negotiation
+* Accept or decline offers
+* Manage confirmed bookings
+* Track service status
+* Receive in-app notifications
+* Submit reviews after completed services
+* Manage personal profile
+* Report issues and raise disputes
+
+### Service Provider Features
+
+* Provider registration and login
+* Manage provider profile
+* Add and manage offered services
+* Define service areas
+* Manage availability
+* View suitable service groups
+* View individual customer requirements within a group
+* Submit group-based price offers
+* Negotiate with the group coordinator
+* Manage bookings
+* Update service status
+* View booking history
+* Receive customer reviews
+
+### Admin Features
+
+* Admin authentication
+* Dashboard with application statistics
+* Manage customers and service providers
+* Verify and manage service providers
+* Manage service categories and services
+* Monitor service requests and bookings
+* Handle user reports and disputes
+* Suspend or manage user accounts
+* View application activity
+* Export booking data as CSV
+
+### Core Platform Features
+
+* Same-service grouping even when customer problems are different
+* Locality-based and availability-based request matching
+* Configurable group size with a maximum of 10 members
+* Request-specific anonymous identities
+* Real-time WebSocket communication
+* Provider offer and counter-offer system
+* Offer expiry handling
+* Role-based access control
+* Session-based authentication
+* BCrypt password hashing
+* Input validation and error handling
+* JDBC and JPA/Hibernate persistence
+* MySQL database storage
+* Java I/O based CSV export
+* Java Reflection-based entity metadata utility
+* Background processing for offer expiry and notifications
+
 
 ## Technology Stack
 
@@ -24,40 +101,251 @@ SameNeed addresses a common problem: when several people in a locality need the 
 
 > Tomcat 10.1 or later is required because the project uses the `jakarta.*` namespace introduced in Jakarta EE 9.
 
-## Prerequisites
+## Steps to Install & Run the Project
 
-- JDK 17
-- Apache Tomcat 10.1+
-- MySQL 8.0+
-- Apache Maven 3.8+
+### 1. Install Prerequisites
 
-## Database Setup
+Make sure the following software is installed on your system:
 
-1. Create a schema named `sameneed` in MySQL.
-2. Run `database.sql` against that schema. The script drops and recreates all tables and inserts seed data (service categories, services, one sample provider, and sample service requests).
+* JDK 17 or later
+* Apache Maven 3.8+
+* MySQL 8.0+
+* Apache Tomcat 10.1+
+* A web browser
+* An IDE such as IntelliJ IDEA, Eclipse, or VS Code
+
+Verify the installations:
+
+```bash
+java -version
+mvn -version
+mysql --version
+```
+
+### 2. Create the Database
+
+Open MySQL and create the `sameneed` database:
 
 ```sql
+CREATE DATABASE sameneed;
+```
+
+Select the database:
+
+```sql
+USE sameneed;
+```
+
+Run the provided `database.sql` file to create the required tables and insert the initial service categories, services, provider data, and sample service requests.
+
+Alternatively, from the project directory:
+
+```bash
 mysql -u root -p sameneed < database.sql
 ```
 
-## Configuration
+### 3. Configure Database Connection
 
-Database credentials are stored in two places (both must match):
+Open:
 
-**`src/main/resources/db.properties`** — used by the raw JDBC layer (`DatabaseConfig`).
+```text
+src/main/resources/db.properties
+```
 
-**`src/main/resources/META-INF/persistence.xml`** — used by the JPA/Hibernate layer for the three JPA-managed entities (`ServiceCategory`, `Service`, `ProviderProfile`).
+Update the database details according to your MySQL installation:
 
-Update the `db.url`, `db.username`, and `db.password` values in both files before building.
+```properties
+db.url=jdbc:mysql://localhost:3306/sameneed
+db.username=root
+db.password=your_password
+```
 
-## Build and Deploy
+Update the corresponding database connection properties in:
+
+```text
+src/main/resources/META-INF/persistence.xml
+```
+
+Make sure both configurations point to the same MySQL database.
+
+### 4. Build the Project
+
+Open a terminal in the root directory of the project and run:
 
 ```bash
 mvn clean package
+```
+
+Maven will compile the Java source files, resolve dependencies, run the configured build process, and generate the WAR file inside the `target` directory.
+
+The generated file will be:
+
+```text
+target/SameNeed-1.0.0.war
+```
+
+### 5. Deploy to Apache Tomcat
+
+Copy the generated WAR file into the Tomcat `webapps` directory.
+
+For Windows:
+
+```bash
 copy target\SameNeed-1.0.0.war <TOMCAT_HOME>\webapps\ROOT.war
 ```
 
-Start Tomcat and navigate to `http://localhost:8080`.
+For Linux/macOS:
+
+```bash
+cp target/SameNeed-1.0.0.war <TOMCAT_HOME>/webapps/ROOT.war
+```
+
+Using `ROOT.war` makes the application available directly from the Tomcat root URL.
+
+### 6. Start Tomcat
+
+Start the Tomcat server.
+
+On Windows:
+
+```text
+<TOMCAT_HOME>\bin\startup.bat
+```
+
+On Linux/macOS:
+
+```bash
+<TOMCAT_HOME>/bin/startup.sh
+```
+
+Wait for Tomcat to deploy the application successfully.
+
+### 7. Open the Application
+
+Open a browser and visit:
+
+```text
+http://localhost:8080
+```
+
+The SameNeed home page should appear.
+
+### 8. Test the Application
+
+The application can be tested using the seeded data or by creating new accounts.
+
+#### Customer Testing
+
+1. Register a customer account.
+2. Log in to the customer dashboard.
+3. Create a service request.
+4. Select a service such as `Washing Machine Repair`.
+5. Enter the problem, locality, preferred date, time, and budget.
+6. Browse other open requests for the same service.
+7. Join an existing group.
+8. Open the group page and verify the anonymous member identities.
+9. Send and receive messages through the group chat.
+10. Check provider offers and negotiation details.
+11. Accept or decline an offer.
+12. Complete the booking workflow.
+13. Submit a review after the service is completed.
+
+#### Service Provider Testing
+
+1. Register a service provider account.
+2. Log in to the provider dashboard.
+3. Complete the provider profile.
+4. Add the services offered.
+5. View eligible service groups.
+6. Open a group to view its aggregated requirements.
+7. Submit a group-based offer.
+8. Send a counter-offer when required.
+9. Accept a negotiated offer.
+10. Update the booking status as the service progresses.
+
+#### Admin Testing
+
+1. Log in using an administrator account.
+2. View dashboard statistics.
+3. Manage customers and service providers.
+4. Verify or manage providers.
+5. Manage service categories and services.
+6. Monitor service requests and bookings.
+7. Review reports and disputes.
+8. Suspend or manage accounts when required.
+9. Test the CSV export functionality.
+10. Access the restricted entity metadata functionality.
+
+### 9. Verify WebSocket Chat
+
+After joining a service group, open the same group from two authenticated browser sessions or accounts.
+
+Send a message from one member and verify that it appears in the other active session without manually refreshing the page.
+
+The WebSocket endpoint is:
+
+```text
+ws://localhost:8080/ws/chat/{requestId}
+```
+
+### 10. Stop the Application
+
+When testing is complete, stop Tomcat using:
+
+Windows:
+
+```text
+<TOMCAT_HOME>\bin\shutdown.bat
+```
+
+Linux/macOS:
+
+```bash
+<TOMCAT_HOME>/bin/shutdown.sh
+```
+
+### Troubleshooting
+
+#### MySQL Connection Error
+
+Check that:
+
+* MySQL server is running.
+* The `sameneed` database exists.
+* The username and password are correct.
+* The JDBC URL uses the correct port.
+
+#### Application Does Not Start
+
+Check the Tomcat console and logs for deployment or configuration errors.
+
+Also verify that the project is being deployed to **Tomcat 10.1+**, because SameNeed uses the `jakarta.*` namespace.
+
+#### WAR File Is Not Generated
+
+Run:
+
+```bash
+mvn clean package
+```
+
+and check the Maven output for compilation or dependency errors.
+
+#### Port 8080 Is Already in Use
+
+Change the Tomcat HTTP connector port in:
+
+```text
+<TOMCAT_HOME>/conf/server.xml
+```
+
+Then access the application using the updated port.
+
+For example:
+
+```text
+http://localhost:8081
+```
 
 ## Project Structure
 
@@ -166,9 +454,263 @@ Two daemon threads start at application startup via `AppLifecycleListener`:
 | `reports` | Abuse reports |
 | `disputes` | Disputes filed against a booking |
 
-## Known Limitations
+## Instructions for Testing
 
-- The JPA persistence unit only manages three entities (`ServiceCategory`, `Service`, `ProviderProfile`). All other DB operations use raw JDBC.
-- There is no email verification flow for new registrations.
-- Provider availability is stored in the database but there is no frontend UI to view or edit it.
-- The CSV export endpoint exists in `ExportServlet` but is not yet wired to a button in the admin frontend.
+SameNeed can be tested by running the application on Apache Tomcat and using separate browser sessions for different user roles.
+
+### 1. Customer Registration and Login
+
+1. Open the application at `http://localhost:8080`.
+2. Open the registration page.
+3. Create a new customer account with valid details.
+4. Log in using the registered credentials.
+5. Verify that the customer dashboard is displayed.
+6. Test logout and confirm that protected pages cannot be accessed without authentication.
+
+### 2. Create a Service Request
+
+1. Log in as a customer.
+2. Open **Create Service Request**.
+3. Select a service category and service.
+4. Enter the individual problem.
+5. Enter the locality, preferred date, preferred time, and expected budget.
+6. Set the required group size.
+7. Submit the request.
+8. Verify that the request appears in the list of available requests.
+
+Example:
+
+```text
+Service: Washing Machine Repair
+Problem: Machine is not draining
+Locality: Kolar Road
+Preferred Date: 25 September 2026
+Preferred Time: 11:00 AM - 2:00 PM
+Expected Budget: ₹700
+```
+
+### 3. Test Same-Service Grouping
+
+1. Create another customer account using a separate browser or incognito window.
+2. Log in as the second customer.
+3. Create or browse a request for the same service.
+4. Use a different problem description, such as `water leakage`.
+5. Verify that the customer can discover the washing machine repair group.
+6. Join the group.
+7. Confirm that the group count is updated.
+
+The test should demonstrate that customers are grouped by the **service they need**, not by having identical problem descriptions.
+
+### 4. Test Anonymous Group Members
+
+1. Open the group as a customer.
+2. Verify that other members are displayed using anonymous identities such as:
+
+```text
+Member 01
+Member 02
+Member 03
+```
+
+3. Verify that members cannot see another member's private contact information during group formation.
+
+### 5. Test Real-Time Group Chat
+
+1. Open the same group using two authenticated browser sessions.
+2. Send a message from the first customer.
+3. Verify that the message appears in the second session without refreshing the page.
+4. Send a reply from the second customer.
+5. Verify that the first session receives the message.
+6. Refresh the group and verify that previously sent messages remain available.
+
+This tests both the WebSocket communication and database persistence of chat messages.
+
+### 6. Test Service Provider Workflow
+
+1. Register or log in as a service provider.
+2. Complete the provider profile.
+3. Add the relevant service, such as `Washing Machine Repair`.
+4. Open the provider request/group section.
+5. Verify that suitable service groups are displayed.
+6. Open a group and verify that the provider can see the service, locality, preferred schedule, group size, and individual service issues.
+7. Submit a group-based price offer.
+
+### 7. Test Offer and Negotiation
+
+Use a simple negotiation scenario:
+
+```text
+Provider Offer:       ₹800 per member
+Coordinator Counter:  ₹600 per member
+Provider Counter:     ₹700 per member
+Coordinator Counter:  ₹650 per member
+Provider Final Offer: ₹675 per member
+```
+
+Verify that:
+
+* Each offer is stored in the database.
+* Previous offers remain visible in the negotiation history.
+* The latest offer has the correct status.
+* Members can accept or decline the offer.
+* An expired offer cannot be accepted after its validity period.
+* A booking can be created only after the required offer conditions are satisfied.
+
+### 8. Test Booking and Service Status
+
+Verify the booking workflow:
+
+```text
+REQUESTED
+    ↓
+GROUP_FORMING
+    ↓
+PROVIDER_CONTACTED
+    ↓
+OFFER_RECEIVED
+    ↓
+NEGOTIATING
+    ↓
+OFFER_ACCEPTED
+    ↓
+BOOKED
+    ↓
+IN_PROGRESS
+    ↓
+COMPLETED
+    ↓
+REVIEWED
+```
+
+Verify that valid status changes are saved correctly and displayed to the relevant users.
+
+### 9. Test Reviews
+
+1. Complete a booking.
+2. Open the review section.
+3. Submit a rating and review.
+4. Verify that the review is stored.
+5. Verify that reviews are associated with the correct completed service.
+
+### 10. Test Admin Functions
+
+1. Log in using an administrator account.
+2. Open the admin dashboard.
+3. Verify application statistics.
+4. Test customer and provider management.
+5. Test provider verification.
+6. Test service category and service management.
+7. Review reports and disputes.
+8. Test account suspension or management.
+9. Test CSV export.
+10. Test the restricted entity metadata feature.
+
+### 11. Test Validation and Error Handling
+
+Test invalid or incomplete inputs, including:
+
+* Empty required fields
+* Invalid email format
+* Invalid password
+* Invalid date or time
+* Invalid budget
+* Group size greater than the configured maximum
+* Joining a full group
+* Joining the same group twice
+* Accessing another user's private data
+* Accessing customer functionality as a provider
+* Accessing admin functionality without admin privileges
+* Submitting an offer for an unavailable request
+
+The application should display an appropriate error response instead of failing unexpectedly.
+
+### 12. Test Database Persistence
+
+After performing important operations, verify that the corresponding records are stored in MySQL.
+
+Test records should include:
+
+* Users
+* Service requests
+* Request members
+* Chat messages
+* Offers
+* Offer negotiations
+* Offer responses
+* Bookings
+* Reviews
+* Notifications
+* Reports
+
+Restart Tomcat and verify that persistent data is still available.
+
+## Screenshots
+
+Screenshots are recommended for demonstrating the major parts of the application in the project report.
+
+Suggested screenshots:
+
+### Customer Portal
+
+1. Home/Landing Page
+2. Customer Registration
+3. Customer Login
+4. Customer Dashboard
+5. Create Service Request
+6. Available Service Requests
+7. Request Details
+8. Group Members with Anonymous Identities
+9. Real-Time Group Chat
+10. Provider Offer and Negotiation
+11. Booking Details
+12. Service History
+13. Review Submission
+14. Notifications
+
+### Service Provider Portal
+
+15. Provider Registration/Login
+16. Provider Dashboard
+17. Provider Profile and Services
+18. Available Service Groups
+19. Group Requirement Details
+20. Send Offer
+21. Negotiation History
+22. Booking and Service Status
+
+### Admin Portal
+
+23. Admin Dashboard
+24. User Management
+25. Provider Verification
+26. Service Category/Service Management
+27. Reports and Disputes
+28. Booking Monitoring
+29. Entity Metadata/Reflection View
+30. CSV Export Result
+
+### Screenshots
+
+**Figure 1: Customer Dashboard**
+Shows the customer's active service requests, joined groups, notifications, and booking information.
+
+**Figure 2: Same-Service Group Formation**
+Shows customers with different individual problems joining a common Washing Machine Repair group.
+
+**Figure 3: Anonymous Group Members**
+Demonstrates privacy-preserving member identities during group formation.
+
+**Figure 4: Real-Time Group Chat**
+Demonstrates WebSocket-based communication between group members.
+
+**Figure 5: Provider Negotiation**
+Shows the provider's offer and the coordinator's counter-offer history.
+
+**Figure 6: Booking Status**
+Shows the progression of a confirmed service booking.
+
+**Figure 7: Admin Dashboard**
+Shows administrative statistics and management functions.
+
+**Figure 8: CSV Export**
+Shows the exported booking data generated by the Java I/O functionality.
