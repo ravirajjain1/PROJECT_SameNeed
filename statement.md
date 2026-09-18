@@ -1,7 +1,3 @@
-# Project Problem Statement
-
-## Title
-
 **SameNeed — A Community Service Pooling Platform**
 
 ## Background
