@@ -660,7 +660,7 @@ Restart Tomcat and verify that persistent data is still available.
 
 ![SameNeed Login](screenshots/login.png)
 
-### Register Page
+### Registration Page
 
 ![SameNeed User Registration](screenshots/user_register.png)
 ![SameNeed Service Provider Registration](screenshots/provider_register.png)
