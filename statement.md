@@ -1,4 +1,4 @@
-# SameNeed — A Collective Platform for Local Service Requests
+# SameNeed — Connecting People with Shared Service Needs
 
 ## Background
 
