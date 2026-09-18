@@ -1,4 +1,4 @@
-# PROJECT_SameNeed
+# SameNeed
 
 A Java web application that lets multiple customers with the same service need pool together into a group and collectively negotiate with a service provider for a shared visit.
 
