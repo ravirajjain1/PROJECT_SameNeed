@@ -644,53 +644,7 @@ Test records should include:
 
 Restart Tomcat and verify that persistent data is still available.
 
-## Screenshots
-
-Screenshots are recommended for demonstrating the major parts of the application in the project report.
-
-Suggested screenshots:
-
-### Customer Portal
-
-1. Home/Landing Page
-2. Customer Registration
-3. Customer Login
-4. Customer Dashboard
-5. Create Service Request
-6. Available Service Requests
-7. Request Details
-8. Group Members with Anonymous Identities
-9. Real-Time Group Chat
-10. Provider Offer and Negotiation
-11. Booking Details
-12. Service History
-13. Review Submission
-14. Notifications
-
-### Service Provider Portal
-
-15. Provider Registration/Login
-16. Provider Dashboard
-17. Provider Profile and Services
-18. Available Service Groups
-19. Group Requirement Details
-20. Send Offer
-21. Negotiation History
-22. Booking and Service Status
-
-### Admin Portal
-
-23. Admin Dashboard
-24. User Management
-25. Provider Verification
-26. Service Category/Service Management
-27. Reports and Disputes
-28. Booking Monitoring
-29. Entity Metadata/Reflection View
-30. CSV Export Result
-
 # Screenshots
-
 
 ### Homepage
 
