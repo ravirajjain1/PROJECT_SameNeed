@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provider Dashboard — SameNeed</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="navbar" id="navbar"></nav>
+<div class="container">
+    <div class="page-header">
+        <h1 id="welcome-msg">Provider Dashboard</h1>
+        <p>Manage your service offers and bookings.</p>
+    </div>
+    <div class="stat-grid" id="stat-grid"></div>
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-title">Open Group Requests (Eligible for You)</div>
+            <div id="eligible-requests"><div class="loading">Loading…</div></div>
+            <a href="/provider-requests.html" class="btn btn-outline btn-sm mt-2">View All</a>
+        </div>
+        <div class="card">
+            <div class="card-title">My Recent Offers</div>
+            <div id="my-offers"><div class="loading">Loading…</div></div>
+        </div>
+        <div class="card">
+            <div class="card-title">Recent Bookings</div>
+            <div id="my-bookings"><div class="loading">Loading…</div></div>
+            <a href="/bookings.html" class="btn btn-outline btn-sm mt-2">View All Bookings</a>
+        </div>
+    </div>
+</div>
+<script src="/js/api.js"></script>
+<script src="/js/requests.js"></script>
+<script>
+    const session = requireAuth(['SERVICE_PROVIDER']);
+    if (session) {
+        buildNavbar('navbar');
+        document.getElementById('welcome-msg').textContent = 'Welcome, ' + session.displayName;
+        loadStats();
+        loadEligibleRequests();
+        loadMyOffers();
+        loadMyBookings();
+    }
+
+    async function loadStats() {
+        const [offersRes, bookingsRes] = await Promise.all([
+            fetchJson('GET', '/api/offers'),
+            fetchJson('GET', '/api/bookings')
+        ]);
+        const offers = offersRes.ok ? offersRes.data : [];
+        const bookings = bookingsRes.ok ? bookingsRes.data : [];
+        document.getElementById('stat-grid').innerHTML = `
+            <div class="stat-card"><div class="stat-value">${offers.length}</div><div class="stat-label">Total Offers</div></div>
+            <div class="stat-card"><div class="stat-value">${offers.filter(o=>o.status==='PENDING'||o.status==='COUNTERED').length}</div><div class="stat-label">Active Negotiations</div></div>
+            <div class="stat-card"><div class="stat-value">${bookings.length}</div><div class="stat-label">Total Bookings</div></div>
+            <div class="stat-card"><div class="stat-value">${bookings.filter(b=>b.status==='CONFIRMED'||b.status==='IN_PROGRESS').length}</div><div class="stat-label">Active Jobs</div></div>
+        `;
+    }
+
+    async function loadEligibleRequests() {
+        const el = document.getElementById('eligible-requests');
+        const res = await fetchJson('GET', '/api/requests');
+        if (!res.ok || !res.data || res.data.length === 0) {
+            el.innerHTML = '<div class="empty-state"><strong>No eligible requests at the moment</strong></div>';
+            return;
+        }
+        el.innerHTML = res.data.slice(0,3).map(req => `
+            <div style="padding:0.5rem 0;border-bottom:1px solid var(--gray-100)">
+                <div class="flex-between">
+                    <a href="/request-detail.html?id=${req.requestId}">${escH(req.serviceName)}</a>
+                    ${statusBadge(req.status)}
+                </div>
+                <div class="text-muted text-sm">${escH(req.locality)} &bull; ${req.preferredDate} &bull; 👥 ${req.currentMemberCount}/${req.maxGroupSize}</div>
+            </div>
+        `).join('');
+    }
+
+    async function loadMyOffers() {
+        const el = document.getElementById('my-offers');
+        const res = await fetchJson('GET', '/api/offers');
+        if (!res.ok || !res.data || res.data.length === 0) {
+            el.innerHTML = '<div class="empty-state"><strong>No offers sent yet</strong></div>';
+            return;
+        }
+        el.innerHTML = res.data.slice(0,4).map(o => `
+            <div style="padding:0.5rem 0;border-bottom:1px solid var(--gray-100)">
+                <div class="flex-between">
+                    <a href="/request-detail.html?id=${o.requestId}">Request #${o.requestId}</a>
+                    ${statusBadge(o.status)}
+                </div>
+                <div class="text-muted text-sm">₹${o.amountPerMember} per member</div>
+            </div>
+        `).join('');
+    }
+
+    async function loadMyBookings() {
+        const el = document.getElementById('my-bookings');
+        const res = await fetchJson('GET', '/api/bookings');
+        if (!res.ok || !res.data || res.data.length === 0) {
+            el.innerHTML = '<div class="empty-state"><strong>No bookings yet</strong></div>';
+            return;
+        }
+        el.innerHTML = res.data.slice(0,3).map(b => `
+            <div style="padding:0.5rem 0;border-bottom:1px solid var(--gray-100)">
+                <div class="flex-between">
+                    <a href="/booking-detail.html?id=${b.bookingId}">${escH(b.serviceName)}</a>
+                    ${statusBadge(b.status)}
+                </div>
+                <div class="text-muted text-sm">${escH(b.locality)} &bull; ${b.scheduledDate || '—'}</div>
+            </div>
+        `).join('');
+    }
+
+    function escH(s){ if(!s)return''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>

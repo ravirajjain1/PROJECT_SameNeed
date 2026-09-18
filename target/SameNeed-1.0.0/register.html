@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register — SameNeed</title>
+    <meta name="description" content="Create your SameNeed account as a customer or service provider.">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
+        .auth-box { width: 100%; max-width: 480px; }
+        .auth-logo { text-align: center; font-size: 1.5rem; font-weight: 700; color: var(--primary); margin-bottom: 1.5rem; }
+        .auth-logo span { color: var(--gray-800); }
+        .role-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; }
+        .role-tab { flex: 1; padding: 0.5rem; border: 2px solid var(--gray-200); border-radius: var(--border-radius); text-align: center; cursor: pointer; font-size: 0.875rem; font-weight: 500; background: white; color: var(--gray-600); transition: all 0.15s; }
+        .role-tab.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+    </style>
+</head>
+<body>
+<div class="auth-box">
+    <div class="auth-logo">Same<span>Need</span></div>
+    <div class="card">
+        <h1 style="font-size:1.2rem;margin-bottom:1rem">Create Account</h1>
+        <div id="msg" class="alert" style="display:none"></div>
+        <div class="role-tabs">
+            <div class="role-tab active" id="tab-customer" onclick="selectRole('CUSTOMER')">I need a service</div>
+            <div class="role-tab" id="tab-provider" onclick="selectRole('SERVICE_PROVIDER')">I provide services</div>
+        </div>
+        <form id="reg-form">
+            <input type="hidden" id="role" value="CUSTOMER">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="displayName">Full Name</label>
+                    <input class="form-control" id="displayName" type="text" placeholder="Your name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="phone">Phone</label>
+                    <input class="form-control" id="phone" type="tel" placeholder="10-digit number">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="email">Email</label>
+                <input class="form-control" id="email" type="email" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="password">Password <span class="text-muted">(min 6 characters)</span></label>
+                <input class="form-control" id="password" type="password" placeholder="••••••••" required minlength="6">
+            </div>
+            <div id="customer-fields">
+                <div class="form-group">
+                    <label class="form-label" for="locality">Your Locality / Area</label>
+                    <input class="form-control" id="locality" type="text" placeholder="e.g. Koregaon Park">
+                </div>
+            </div>
+            <div id="provider-fields" style="display:none">
+                <div class="form-group">
+                    <label class="form-label" for="businessName">Business Name</label>
+                    <input class="form-control" id="businessName" type="text" placeholder="Your business name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="serviceArea">Service Area</label>
+                    <input class="form-control" id="serviceArea" type="text" placeholder="e.g. Koregaon Park, Aundh">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="bio">About Your Business</label>
+                    <textarea class="form-control" id="bio" placeholder="Brief description of your services…"></textarea>
+                </div>
+            </div>
+            <button class="btn btn-primary full-width" type="submit" id="submit-btn">Create Account</button>
+        </form>
+        <p class="text-sm text-muted mt-2" style="text-align:center">
+            Already have an account? <a href="/login.html">Sign in</a>
+        </p>
+    </div>
+</div>
+<script src="/js/api.js"></script>
+<script>
+    function selectRole(role) {
+        document.getElementById('role').value = role;
+        document.getElementById('tab-customer').classList.toggle('active', role === 'CUSTOMER');
+        document.getElementById('tab-provider').classList.toggle('active', role === 'SERVICE_PROVIDER');
+        document.getElementById('customer-fields').style.display = role === 'CUSTOMER' ? 'block' : 'none';
+        document.getElementById('provider-fields').style.display = role === 'SERVICE_PROVIDER' ? 'block' : 'none';
+    }
+
+    document.getElementById('reg-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        hideAlert('msg');
+        const btn = document.getElementById('submit-btn');
+        btn.disabled = true;
+        btn.textContent = 'Creating account…';
+
+        const role = document.getElementById('role').value;
+        const body = {
+            role,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value,
+            displayName: document.getElementById('displayName').value,
+            phone: document.getElementById('phone').value,
+        };
+
+        if (role === 'CUSTOMER') {
+            body.locality = document.getElementById('locality').value;
+        } else {
+            body.businessName = document.getElementById('businessName').value;
+            body.serviceArea = document.getElementById('serviceArea').value;
+            body.bio = document.getElementById('bio').value;
+        }
+
+        const res = await fetchJson('POST', '/api/auth/register', body);
+        if (res.ok) {
+            showAlert('msg', 'Account created successfully! You can now log in.', 'success');
+            setTimeout(() => window.location.href = '/login.html', 1500);
+        } else {
+            showAlert('msg', res.data?.error || 'Registration failed', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Create Account';
+        }
+    });
+</script>
+</body>
+</html>

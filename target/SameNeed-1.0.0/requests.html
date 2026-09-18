@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Requests — SameNeed</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="navbar" id="navbar"></nav>
+<div class="container">
+    <div class="page-header flex-between">
+        <div>
+            <h1>Browse Service Requests</h1>
+            <p>Find a group to join or search for compatible requests to group with your own.</p>
+        </div>
+        <a href="/create-request.html" class="btn btn-primary">+ New Request</a>
+    </div>
+
+    <div class="card mb-2">
+        <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr 1fr auto">
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                <select class="form-control" id="categoryId"><option value="">All Categories</option></select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Service</label>
+                <select class="form-control" id="serviceId"><option value="">All Services</option></select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Locality</label>
+                <input class="form-control" id="locality" type="text" placeholder="e.g. Koregaon Park">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Date</label>
+                <input class="form-control" id="preferredDate" type="date">
+            </div>
+            <div class="form-group" style="align-self:flex-end">
+                <button class="btn btn-primary" onclick="doSearch()">Search</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="msg" class="alert" style="display:none"></div>
+    <div id="results"><div class="loading">Loading open requests…</div></div>
+</div>
+<script src="/js/api.js"></script>
+<script src="/js/requests.js"></script>
+<script>
+    const session = requireAuth(['CUSTOMER', 'SERVICE_PROVIDER']);
+    if (session) {
+        buildNavbar('navbar');
+        loadCategories();
+        loadRequests('results');
+    }
+
+    function doSearch() {
+        const serviceId = document.getElementById('serviceId').value;
+        const locality = document.getElementById('locality').value;
+        const date = document.getElementById('preferredDate').value;
+
+        if (serviceId && locality && date) {
+            loadMatchingRequests(serviceId, locality, date, 'results');
+        } else {
+            loadRequests('results');
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Categories — SameNeed Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="navbar" id="navbar"></nav>
+<div class="container">
+    <div class="page-header flex-between">
+        <div><h1>Service Categories</h1><p>Manage the service taxonomy.</p></div>
+        <a href="/admin/index.html" class="btn btn-ghost btn-sm">← Dashboard</a>
+    </div>
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-title">Add Category</div>
+            <div id="cat-msg" class="alert" style="display:none"></div>
+            <form id="add-cat-form">
+                <div class="form-group">
+                    <label class="form-label" for="catName">Category Name</label>
+                    <input class="form-control" id="catName" placeholder="e.g. Appliance Repair" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="catDesc">Description</label>
+                    <textarea class="form-control" id="catDesc" placeholder="Brief description…"></textarea>
+                </div>
+                <button class="btn btn-primary" type="submit">Add Category</button>
+            </form>
+            <hr style="margin:1rem 0;border:none;border-top:1px solid var(--gray-200)">
+            <div class="card-title">Add Service</div>
+            <div id="svc-msg" class="alert" style="display:none"></div>
+            <form id="add-svc-form">
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-control" id="svcCatId" required><option value="">Select Category</option></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="svcName">Service Name</label>
+                    <input class="form-control" id="svcName" placeholder="e.g. Washing Machine Repair" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="svcDesc">Description</label>
+                    <input class="form-control" id="svcDesc" placeholder="Brief description…">
+                </div>
+                <button class="btn btn-primary" type="submit">Add Service</button>
+            </form>
+        </div>
+        <div class="card">
+            <div class="card-title">Existing Categories</div>
+            <div id="cat-list"><div class="loading">Loading…</div></div>
+        </div>
+    </div>
+</div>
+<script src="/js/api.js"></script>
+<script>
+    const session = requireAuth(['ADMIN']);
+    if (session) { buildNavbar('navbar'); loadCategories(); }
+
+    async function loadCategories() {
+        const res = await fetchJson('GET', '/api/categories');
+        const el = document.getElementById('cat-list');
+        const catSel = document.getElementById('svcCatId');
+        if (!res.ok || !res.data) return;
+        catSel.innerHTML = '<option value="">Select Category</option>' +
+            res.data.map(c => `<option value="${c.categoryId}">${escH(c.name)}</option>`).join('');
+        el.innerHTML = res.data.map(c => `
+            <div style="padding:0.5rem 0;border-bottom:1px solid var(--gray-100)" class="flex-between">
+                <div>
+                    <div class="font-semibold text-sm">${escH(c.name)}</div>
+                    <div class="text-muted text-sm">${escH(c.description||'')}</div>
+                </div>
+                <button class="btn btn-danger btn-sm" onclick="deleteCat(${c.categoryId})">Delete</button>
+            </div>
+        `).join('');
+    }
+
+    async function deleteCat(id) {
+        if (!confirm('Delete this category and all its services?')) return;
+        const res = await fetchJson('DELETE', `/api/categories/${id}`);
+        if (res.ok) loadCategories();
+        else showAlert('cat-msg', res.data?.error || 'Failed', 'error');
+    }
+
+    document.getElementById('add-cat-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const res = await fetchJson('POST', '/api/categories', {
+            name: document.getElementById('catName').value,
+            description: document.getElementById('catDesc').value
+        });
+        if (res.ok) { showAlert('cat-msg', 'Category added!', 'success'); e.target.reset(); loadCategories(); }
+        else showAlert('cat-msg', res.data?.error || 'Failed', 'error');
+    });
+
+    document.getElementById('add-svc-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const res = await fetchJson('POST', '/api/services', {
+            categoryId: parseInt(document.getElementById('svcCatId').value),
+            name: document.getElementById('svcName').value,
+            description: document.getElementById('svcDesc').value
+        });
+        if (res.ok) { showAlert('svc-msg', 'Service added!', 'success'); e.target.reset(); }
+        else showAlert('svc-msg', res.data?.error || 'Failed', 'error');
+    });
+
+    function escH(s){ if(!s)return''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>

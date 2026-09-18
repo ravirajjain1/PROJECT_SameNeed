@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users — SameNeed Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="navbar" id="navbar"></nav>
+<div class="container">
+    <div class="page-header flex-between">
+        <div><h1>Manage Customers</h1><p>View and manage all customer accounts.</p></div>
+        <a href="/admin/index.html" class="btn btn-ghost btn-sm">← Dashboard</a>
+    </div>
+    <div class="card">
+        <div class="table-wrapper">
+            <div id="user-table"><div class="loading">Loading…</div></div>
+        </div>
+    </div>
+</div>
+<script src="/js/api.js"></script>
+<script src="/js/admin.js"></script>
+<script>
+    const session = requireAuth(['ADMIN']);
+    if (session) { buildNavbar('navbar'); loadUserTable('user-table', 'CUSTOMER'); }
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+com\sameneed\util\UtilTest.class
+com\sameneed\service\AuthServiceTest.class
+com\sameneed\service\MatchingServiceTest.class
+com\sameneed\service\RequestServiceTest.class
+com\sameneed\util\UtilTest$TestData.class

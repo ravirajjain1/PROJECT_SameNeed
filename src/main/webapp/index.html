@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SameNeed — Group Up, Save More</title>
+    <meta name="description"
+        content="Group together with neighbours who need the same home or repair service and get discounted group rates from verified local providers.">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="navbar-brand">
+            Same<span>Need</span>
+        </a>
+        <ul class="navbar-nav">
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="requests.html">Open Groups</a></li>
+            <li><a href="#portals">Portals</a></li>
+        </ul>
+        <div class="navbar-right" id="nav-auth-section">
+            <a href="login.html" class="btn btn-outline btn-sm">Sign In</a>
+            <a href="register.html" class="btn btn-primary btn-sm">Get Started</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container hero-wrap">
+            <div>
+                <div class="hero-pill">
+                    Local Service Pooling &middot; Pune Communities
+                </div>
+                <h1 class="hero-title">
+                    Group with neighbours.<br>
+                    <span>Save up to 40% on every service.</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Why pay full individual rates when people in your apartment or neighborhood need the exact same
+                    maintenance? SameNeed clusters nearby demand so you get bulk quotes from certified technicians and
+                    negotiate together.
+                </p>
+
+                <form class="hero-search-box" id="quick-search-form">
+                    <select id="search-locality" aria-label="Locality">
+                        <option value="">Select Locality</option>
+                        <option value="Koregaon Park">Koregaon Park</option>
+                        <option value="Aundh">Aundh</option>
+                        <option value="Baner">Baner</option>
+                    </select>
+                    <select id="search-category" aria-label="Service Category">
+                        <option value="">Select Service</option>
+                        <option value="Home Appliances">Home Appliances</option>
+                        <option value="Plumbing">Plumbing</option>
+                        <option value="Electrical">Electrical</option>
+                        <option value="AC & HVAC">AC &amp; HVAC</option>
+                        <option value="Cleaning">Cleaning</option>
+                        <option value="Pest Control">Pest Control</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Find Groups</button>
+                </form>
+
+                <div class="hero-actions">
+                    <a href="create-request.html" class="btn btn-primary">Create Service Request</a>
+                    <a href="requests.html" class="btn btn-outline">Browse Open Groups</a>
+                    <a href="register.html" class="btn btn-ghost">Join as Provider</a>
+                </div>
+
+                <div class="hero-stats">
+                    <div>
+                        <div class="hero-stat-num">30-40%</div>
+                        <div class="hero-stat-label">Average Group Savings</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-num">100%</div>
+                        <div class="hero-stat-label">Verified Providers</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-num">Anonymous</div>
+                        <div class="hero-stat-label">Privacy in Group Chat</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-preview">
+                <div class="preview-card featured">
+                    <div class="preview-top">
+                        <span class="badge badge-group_forming">Group Forming</span>
+                        <span class="text-sm font-semibold text-muted">Koregaon Park</span>
+                    </div>
+                    <h3 style="font-size:1.15rem;margin-bottom:0.25rem;color:var(--gray-900)">Washing Machine Repair
+                    </h3>
+                    <p class="text-sm text-muted" style="margin-bottom:0.75rem">Drum noise and drainage check across 3
+                        flats in the same lane.</p>
+
+                    <div class="discount-tier-badge">
+                        <span>Unlock Tier: ₹450 / flat (-35% off regular ₹700)</span>
+                    </div>
+
+                    <div class="group-progress-wrap">
+                        <div class="group-progress-bar" style="width: 60%;"></div>
+                    </div>
+
+                    <div class="flex-between">
+                        <span class="text-sm font-semibold" style="color:var(--gray-700)">3 / 5 Members Joined</span>
+                        <a href="requests.html" class="btn btn-primary btn-sm">Join Group</a>
+                    </div>
+                </div>
+
+                <div class="preview-card">
+                    <div class="preview-top">
+                        <span class="badge badge-offer_received">Offer Received</span>
+                        <span class="text-sm font-semibold text-muted">Aundh</span>
+                    </div>
+                    <h3 style="font-size:1.1rem;margin-bottom:0.25rem;color:var(--gray-900)">AC Summer Servicing</h3>
+                    <p class="text-sm text-muted" style="margin-bottom:0.75rem">Complete filter deep clean and gas
+                        pressure top-up.</p>
+                    <div class="flex-between">
+                        <div>
+                            <span class="text-sm font-semibold" style="display:block;color:var(--gray-800)">FixIt Pro
+                                Services</span>
+                            <span class="text-sm text-muted">4.3 ★ &middot; 8 yrs exp</span>
+                        </div>
+                        <a href="requests.html" class="btn btn-outline btn-sm">View Offer</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="portal-section container" id="portals">
+        <div style="text-align:center;max-width:700px;margin:0 auto">
+            <h2 style="font-size:2rem;margin-bottom:0.5rem;color:var(--gray-900);letter-spacing:-0.02em">Choose Your
+                Platform Portal</h2>
+            <p class="text-muted">Access customer request tools or service provider operations directly.</p>
+        </div>
+
+        <div class="portal-grid">
+            <div class="portal-card">
+                <div>
+                    <div class="portal-header">
+                        <div class="portal-icon">C</div>
+                        <span class="badge badge-group_forming">Customers</span>
+                    </div>
+                    <h3>Customer Portal</h3>
+                    <p>Start a new service request, join existing groups in your locality, negotiate collectively, and
+                        manage active bookings.</p>
+                    <ul class="portal-links">
+                        <li><a href="create-request.html">Create Service Request <span class="arrow">&rarr;</span></a>
+                        </li>
+                        <li><a href="requests.html">Explore Open Groups <span class="arrow">&rarr;</span></a></li>
+                        <li><a href="dashboard.html">Customer Dashboard <span class="arrow">&rarr;</span></a></li>
+                        <li><a href="bookings.html">My Bookings &amp; History <span class="arrow">&rarr;</span></a></li>
+                        <li><a href="reviews.html">Rate Completed Services <span class="arrow">&rarr;</span></a></li>
+                    </ul>
+                </div>
+                <a href="dashboard.html" class="btn btn-primary full-width">Open Customer Hub</a>
+            </div>
+
+            <div class="portal-card provider">
+                <div>
+                    <div class="portal-header">
+                        <div class="portal-icon provider">P</div>
+                        <span class="badge badge-in_progress">Providers</span>
+                    </div>
+                    <h3>Service Provider Portal</h3>
+                    <p>Review customer clusters grouped by locality, submit bulk discounted bids, manage schedules, and
+                        track confirmations.</p>
+                    <ul class="portal-links">
+                        <li><a href="provider-dashboard.html">Provider Dashboard <span class="arrow">&rarr;</span></a>
+                        </li>
+                        <li><a href="provider-requests.html">Browse Customer Leads <span class="arrow">&rarr;</span></a>
+                        </li>
+                        <li><a href="register.html">Register as Provider <span class="arrow">&rarr;</span></a></li>
+                        <li><a href="profile.html">Manage Business Profile <span class="arrow">&rarr;</span></a></li>
+                    </ul>
+                </div>
+                <a href="provider-dashboard.html" class="btn btn-outline full-width">Open Provider Hub</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="container" id="how-it-works" style="padding:4rem 0;border-top:1px solid var(--gray-200)">
+        <div style="text-align:center;max-width:700px;margin:0 auto">
+            <h2 style="font-size:2rem;margin-bottom:0.5rem;color:var(--gray-900);letter-spacing:-0.02em">How SameNeed
+                Works</h2>
+            <p class="text-muted">Four straightforward steps that turn single high-cost repairs into affordable group
+                bookings.</p>
+        </div>
+
+        <div class="steps-wrap">
+            <div class="step-box">
+                <div class="step-num">1</div>
+                <h4>Post Your Need</h4>
+                <p>Specify the service category, describe your problem, and define your locality and preferred schedule.
+                </p>
+            </div>
+            <div class="step-box">
+                <div class="step-num">2</div>
+                <h4>Form a Group</h4>
+                <p>Neighbours in your locality join your request. Your identity is kept private with anonymous aliases.
+                </p>
+            </div>
+            <div class="step-box">
+                <div class="step-num">3</div>
+                <h4>Receive &amp; Negotiate</h4>
+                <p>Verified local technicians bid on your group. Use group chat and counter-offers to reach the best
+                    price.</p>
+            </div>
+            <div class="step-box">
+                <div class="step-num">4</div>
+                <h4>Confirm &amp; Save</h4>
+                <p>Accept the offer together, get the work completed at your agreed time, and pay the discounted group
+                    rate.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="container" style="padding:4rem 0;border-top:1px solid var(--gray-200)">
+        <div style="text-align:center;max-width:700px;margin:0 auto">
+            <h2 style="font-size:2rem;margin-bottom:0.5rem;color:var(--gray-900);letter-spacing:-0.02em">Built for
+                Community Trust</h2>
+            <p class="text-muted">Designed from the ground up to protect user privacy and guarantee service quality.</p>
+        </div>
+
+        <div class="trust-grid">
+            <div class="trust-card">
+                <div class="trust-icon">&#128737;&#65039;</div>
+                <h4>Privacy Protected Chat</h4>
+                <p>Every member in a group receives an anonymous alias (e.g. Member 02, Group Creator). Personal phone
+                    numbers and details remain hidden until bookings are confirmed.</p>
+            </div>
+            <div class="trust-card">
+                <div class="trust-icon">&#9989;</div>
+                <h4>Vetted Service Professionals</h4>
+                <p>Contractors and technicians must verify business documentation, maintain minimum rating thresholds,
+                    and adhere to community service standards.</p>
+            </div>
+            <div class="trust-card">
+                <div class="trust-icon">&#9878;&#65039;</div>
+                <h4>Transparent Bidding &amp; Voting</h4>
+                <p>All members see quotes, offer expirations, and negotiation rounds in real time. Offers can only be
+                    accepted when the group consensus is reached.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="container" id="services" style="padding:4rem 0;border-top:1px solid var(--gray-200)">
+        <div style="text-align:center;max-width:700px;margin:0 auto">
+            <h2 style="font-size:2rem;margin-bottom:0.5rem;color:var(--gray-900);letter-spacing:-0.02em">Popular Service
+                Categories</h2>
+            <p class="text-muted">Browse home and maintenance services frequently pooled by residential communities.</p>
+        </div>
+
+        <div class="category-grid">
+            <a href="requests.html" class="category-card">
+                <div class="category-card-top">
+                    <h4>Home Appliances</h4>
+                    <p>Washing machines, refrigerators, microwaves &amp; dishwashers.</p>
+                </div>
+                <span class="category-card-link">View Groups &rarr;</span>
+            </a>
+            <a href="requests.html" class="category-card">
+                <div class="category-card-top">
+                    <h4>Plumbing</h4>
+                    <p>Pipe leak detection, tap replacement &amp; drain unblocking.</p>
+                </div>
+                <span class="category-card-link">View Groups &rarr;</span>
+            </a>
+            <a href="requests.html" class="category-card">
+                <div class="category-card-top">
+                    <h4>Electrical</h4>
+                    <p>Switchboards, fan installations &amp; wiring safety checks.</p>
+                </div>
+                <span class="category-card-link">View Groups &rarr;</span>
+            </a>
+            <a href="requests.html" class="category-card">
+                <div class="category-card-top">
+                    <h4>AC &amp; HVAC</h4>
+                    <p>Routine service, cooling troubleshooting &amp; installation.</p>
+                </div>
+                <span class="category-card-link">View Groups &rarr;</span>
+            </a>
+            <a href="requests.html" class="category-card">
+                <div class="category-card-top">
+                    <h4>Cleaning</h4>
+                    <p>Deep house cleaning, sofa wash &amp; kitchen sanitization.</p>
+                </div>
+                <span class="category-card-link">View Groups &rarr;</span>
+            </a>
+            <a href="requests.html" class="category-card">
+                <div class="category-card-top">
+                    <h4>Pest Control</h4>
+                    <p>Cockroach eradication, termite inspection &amp; treatment.</p>
+                </div>
+                <span class="category-card-link">View Groups &rarr;</span>
+            </a>
+            <a href="requests.html" class="category-card">
+                <div class="category-card-top">
+                    <h4>Carpentry</h4>
+                    <p>Furniture repair, doors, latches &amp; woodwork alterations.</p>
+                </div>
+                <span class="category-card-link">View Groups &rarr;</span>
+            </a>
+            <a href="requests.html" class="category-card">
+                <div class="category-card-top">
+                    <h4>Painting</h4>
+                    <p>Interior touch-ups, wall repairs &amp; full home repainting.</p>
+                </div>
+                <span class="category-card-link">View Groups &rarr;</span>
+            </a>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <div class="container footer-top">
+            <div>
+                <h3 style="color:var(--white);font-size:1.3rem;margin-bottom:0.5rem">SameNeed</h3>
+                <p style="font-size:0.875rem;line-height:1.55;max-width:300px">
+                    A localized service pooling system helping residential communities hire skilled home technicians
+                    together.
+                </p>
+            </div>
+            <div class="footer-col">
+                <h5>Customers</h5>
+                <ul>
+                    <li><a href="create-request.html">Create Request</a></li>
+                    <li><a href="requests.html">Browse Requests</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="bookings.html">Bookings</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Providers</h5>
+                <ul>
+                    <li><a href="provider-dashboard.html">Provider Hub</a></li>
+                    <li><a href="provider-requests.html">Lead Board</a></li>
+                    <li><a href="register.html">Sign Up as Provider</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            <span>&copy; SameNeed. All rights reserved.</span>
+            <span>Group Up, Save More</span>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        const userSession = getSession();
+        if (userSession) {
+            const authSection = document.getElementById('nav-auth-section');
+            let targetHref = 'dashboard.html';
+            let roleName = 'My Dashboard';
+
+            if (userSession.role === 'ADMIN') {
+                targetHref = 'admin/dashboard.html';
+                roleName = 'Admin Dashboard';
+            } else if (userSession.role === 'SERVICE_PROVIDER') {
+                targetHref = 'provider-dashboard.html';
+                roleName = 'Provider Hub';
+            }
+
+            authSection.innerHTML = `
+            <span class="text-sm font-semibold" style="margin-right:0.5rem">Hi, ${userSession.displayName || userSession.email}</span>
+            <a href="${targetHref}" class="btn btn-primary btn-sm">${roleName}</a>
+        `;
+        }
+
+        const searchForm = document.getElementById('quick-search-form');
+        if (searchForm) {
+            searchForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const locality = document.getElementById('search-locality').value;
+                const category = document.getElementById('search-category').value;
+                const params = new URLSearchParams();
+                if (locality) params.set('locality', locality);
+                if (category) params.set('category', category);
+                const query = params.toString();
+                window.location.href = 'requests.html' + (query ? '?' + query : '');
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications — SameNeed</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="navbar" id="navbar"></nav>
+<div class="container" style="max-width:680px">
+    <div class="page-header flex-between">
+        <div>
+            <h1>Notifications</h1>
+            <p>Your recent activity and alerts.</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="markAllRead()">Mark All Read</button>
+    </div>
+    <div class="card">
+        <div id="notif-list"><div class="loading">Loading…</div></div>
+    </div>
+</div>
+<script src="/js/api.js"></script>
+<script>
+    const session = requireAuth();
+    if (session) {
+        buildNavbar('navbar');
+        loadNotifications();
+    }
+
+    async function loadNotifications() {
+        const res = await fetchJson('GET', '/api/notifications');
+        const el = document.getElementById('notif-list');
+        if (!res.ok || !res.data || res.data.length === 0) {
+            el.innerHTML = '<div class="empty-state"><strong>No notifications</strong><p>You\'re all caught up!</p></div>';
+            return;
+        }
+        el.innerHTML = res.data.map(n => `
+            <div style="padding:0.75rem 0;border-bottom:1px solid var(--gray-100);display:flex;gap:0.75rem;align-items:flex-start">
+                <div style="width:8px;height:8px;border-radius:50%;background:${n.read ? 'var(--gray-300)' : 'var(--primary)'};margin-top:0.4rem;flex-shrink:0"></div>
+                <div style="flex:1">
+                    <div class="${n.read ? 'text-muted' : 'font-semibold'} text-sm">${escH(n.message)}</div>
+                    <div class="text-muted" style="font-size:0.75rem;margin-top:0.2rem">${formatDateTime(n.createdAt)}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function markAllRead() {
+        await fetchJson('POST', '/api/notifications/read-all');
+        loadNotifications();
+    }
+
+    function escH(s){ if(!s)return''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>

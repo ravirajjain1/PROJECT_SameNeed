@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — SameNeed</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="navbar" id="navbar"></nav>
+<div class="container">
+    <div class="page-header">
+        <h1 id="welcome-msg">Welcome back</h1>
+        <p>Here's what's happening with your service groups.</p>
+    </div>
+    <div class="stat-grid" id="stat-grid"></div>
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-title">My Recent Requests</div>
+            <div id="my-requests"><div class="loading">Loading…</div></div>
+            <a href="/requests.html" class="btn btn-outline btn-sm mt-2">Browse All Requests</a>
+        </div>
+        <div class="card">
+            <div class="card-title">Recent Notifications</div>
+            <div id="notif-list"><div class="loading">Loading…</div></div>
+        </div>
+    </div>
+</div>
+<script src="/js/api.js"></script>
+<script src="/js/requests.js"></script>
+<script>
+    const session = requireAuth(['CUSTOMER']);
+    if (session) {
+        buildNavbar('navbar');
+        document.getElementById('welcome-msg').textContent = 'Welcome back, ' + session.displayName;
+
+        loadStats();
+        loadMyRequests();
+        loadNotifications();
+    }
+
+    async function loadStats() {
+        const myReqRes = await fetchJson('GET', '/api/requests/my');
+        const joinedRes = await fetchJson('GET', '/api/requests/my?view=joined');
+        const bookRes = await fetchJson('GET', '/api/bookings');
+
+        const grid = document.getElementById('stat-grid');
+        grid.innerHTML = `
+            <div class="stat-card"><div class="stat-value">${myReqRes.ok ? myReqRes.data.length : 0}</div><div class="stat-label">My Requests</div></div>
+            <div class="stat-card"><div class="stat-value">${joinedRes.ok ? joinedRes.data.length : 0}</div><div class="stat-label">Groups Joined</div></div>
+            <div class="stat-card"><div class="stat-value">${bookRes.ok ? bookRes.data.length : 0}</div><div class="stat-label">Bookings</div></div>
+        `;
+    }
+
+    async function loadMyRequests() {
+        const res = await fetchJson('GET', '/api/requests/my');
+        const el = document.getElementById('my-requests');
+        if (!res.ok || !res.data || res.data.length === 0) {
+            el.innerHTML = '<div class="empty-state"><strong>No requests yet</strong><p><a href="/create-request.html">Create your first request</a></p></div>';
+            return;
+        }
+        el.innerHTML = res.data.slice(0, 3).map(req => `
+            <div style="padding:0.5rem 0;border-bottom:1px solid var(--gray-100)">
+                <div class="flex-between">
+                    <a href="/request-detail.html?id=${req.requestId}">${escHtml(req.serviceName)}</a>
+                    ${statusBadge(req.status)}
+                </div>
+                <div class="text-muted text-sm">${req.locality} &bull; ${req.preferredDate}</div>
+            </div>
+        `).join('');
+    }
+
+    async function loadNotifications() {
+        const res = await fetchJson('GET', '/api/notifications');
+        const el = document.getElementById('notif-list');
+        if (!res.ok || !res.data || res.data.length === 0) {
+            el.innerHTML = '<div class="empty-state"><strong>No notifications</strong></div>';
+            return;
+        }
+        el.innerHTML = res.data.slice(0, 5).map(n => `
+            <div style="padding:0.5rem 0;border-bottom:1px solid var(--gray-100);${!n.read ? 'font-weight:500' : ''}">
+                <div class="text-sm">${escHtml(n.message)}</div>
+                <div class="text-muted" style="font-size:0.75rem">${formatDateTime(n.createdAt)}</div>
+            </div>
+        `).join('');
+    }
+</script>
+</body>
+</html>

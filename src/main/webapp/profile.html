@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile — SameNeed</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="navbar" id="navbar"></nav>
+<div class="container" style="max-width:560px">
+    <div class="page-header">
+        <h1>My Profile</h1>
+        <p>Update your personal information.</p>
+    </div>
+    <div class="card">
+        <div id="msg" class="alert" style="display:none"></div>
+        <form id="profile-form">
+            <div class="form-group">
+                <label class="form-label">Display Name</label>
+                <input class="form-control" id="displayName" type="text" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Phone</label>
+                <input class="form-control" id="phone" type="tel">
+            </div>
+            <div id="customer-locality" class="form-group">
+                <label class="form-label">Locality</label>
+                <input class="form-control" id="locality" type="text">
+            </div>
+            <div id="provider-extra" style="display:none">
+                <div class="form-group">
+                    <label class="form-label">Business Name</label>
+                    <input class="form-control" id="businessName" type="text">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Service Area</label>
+                    <input class="form-control" id="serviceArea" type="text">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Bio</label>
+                    <textarea class="form-control" id="bio"></textarea>
+                </div>
+            </div>
+            <button class="btn btn-primary" type="submit" id="save-btn">Save Changes</button>
+        </form>
+    </div>
+
+    <div class="card mt-2">
+        <div class="card-title">Report an Issue</div>
+        <form id="report-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Target Type</label>
+                    <select class="form-control" id="targetType">
+                        <option value="USER">User</option>
+                        <option value="PROVIDER">Provider</option>
+                        <option value="REQUEST">Request</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Target ID</label>
+                    <input class="form-control" id="targetId" type="number" min="1" placeholder="ID number">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Reason</label>
+                <textarea class="form-control" id="reason" placeholder="Describe the issue…"></textarea>
+            </div>
+            <button class="btn btn-danger btn-sm" type="submit">File Report</button>
+        </form>
+        <div id="report-msg" class="alert mt-1" style="display:none"></div>
+    </div>
+</div>
+<script src="/js/api.js"></script>
+<script>
+    const session = requireAuth();
+    if (session) {
+        buildNavbar('navbar');
+        if (session.role === 'SERVICE_PROVIDER') {
+            document.getElementById('provider-extra').style.display = 'block';
+            document.getElementById('customer-locality').style.display = 'none';
+        }
+        document.getElementById('displayName').value = session.displayName || '';
+    }
+
+    document.getElementById('profile-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('save-btn');
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+        const body = {
+            displayName: document.getElementById('displayName').value,
+            phone: document.getElementById('phone').value,
+            locality: document.getElementById('locality').value
+        };
+        const res = await fetchJson('PUT', `/api/users/${session.userId}`, body);
+        if (res.ok) {
+            showAlert('msg', 'Profile updated successfully', 'success');
+            const s = getSession();
+            s.displayName = body.displayName;
+            setSession(s);
+        } else {
+            showAlert('msg', res.data?.error || 'Failed to update profile', 'error');
+        }
+        btn.disabled = false;
+        btn.textContent = 'Save Changes';
+    });
+
+    document.getElementById('report-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const res = await fetchJson('POST', '/api/reports', {
+            targetType: document.getElementById('targetType').value,
+            targetId: parseInt(document.getElementById('targetId').value),
+            reason: document.getElementById('reason').value
+        });
+        if (res.ok) {
+            showAlert('report-msg', 'Report submitted. Thank you.', 'success');
+            document.getElementById('report-form').reset();
+        } else {
+            showAlert('report-msg', res.data?.error || 'Failed to file report', 'error');
+        }
+    });
+</script>
+</body>
+</html>

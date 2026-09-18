@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Review — SameNeed</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="navbar" id="navbar"></nav>
+<div class="container" style="max-width:500px">
+    <div class="page-header">
+        <h1>Leave a Review</h1>
+        <p>Share your experience with the service provider.</p>
+    </div>
+    <div class="card">
+        <div id="msg" class="alert" style="display:none"></div>
+        <form id="review-form">
+            <div class="form-group">
+                <label class="form-label">Rating</label>
+                <div id="star-row" style="display:flex;gap:0.5rem;font-size:1.75rem;cursor:pointer">
+                    <span class="star" data-val="1">☆</span>
+                    <span class="star" data-val="2">☆</span>
+                    <span class="star" data-val="3">☆</span>
+                    <span class="star" data-val="4">☆</span>
+                    <span class="star" data-val="5">☆</span>
+                </div>
+                <input type="hidden" id="rating" value="0">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="comment">Comment (optional)</label>
+                <textarea class="form-control" id="comment" placeholder="Describe your experience…"></textarea>
+            </div>
+            <button class="btn btn-primary full-width" type="submit" id="submit-btn">Submit Review</button>
+        </form>
+    </div>
+    <div class="card mt-2" id="provider-reviews">
+        <div class="card-title">Existing Reviews</div>
+        <div id="reviews-list"><div class="loading">Loading…</div></div>
+    </div>
+</div>
+<script src="/js/api.js"></script>
+<script>
+    const session = requireAuth(['CUSTOMER']);
+    const bookingId = getParam('bookingId');
+    const providerId = getParam('providerId');
+
+    if (session) {
+        buildNavbar('navbar');
+        initStars();
+        loadExistingReviews();
+    }
+
+    function initStars() {
+        const stars = document.querySelectorAll('.star');
+        let selected = 0;
+        stars.forEach(star => {
+            star.addEventListener('mouseover', () => highlightStars(parseInt(star.dataset.val)));
+            star.addEventListener('mouseout', () => highlightStars(selected));
+            star.addEventListener('click', () => {
+                selected = parseInt(star.dataset.val);
+                document.getElementById('rating').value = selected;
+                highlightStars(selected);
+            });
+        });
+    }
+
+    function highlightStars(val) {
+        document.querySelectorAll('.star').forEach(s => {
+            s.textContent = parseInt(s.dataset.val) <= val ? '★' : '☆';
+            s.style.color = parseInt(s.dataset.val) <= val ? '#f59e0b' : '#94a3b8';
+        });
+    }
+
+    async function loadExistingReviews() {
+        if (!providerId) return;
+        const res = await fetchJson('GET', `/api/reviews?providerId=${providerId}`);
+        const el = document.getElementById('reviews-list');
+        if (!res.ok || !res.data || res.data.length === 0) {
+            el.innerHTML = '<div class="text-muted text-sm">No reviews yet.</div>';
+            return;
+        }
+        el.innerHTML = res.data.map(r => `
+            <div style="padding:0.5rem 0;border-bottom:1px solid var(--gray-100)">
+                <div class="flex-between">
+                    <span style="color:#f59e0b">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+                    <span class="text-muted text-sm">${formatDate(r.createdAt)}</span>
+                </div>
+                ${r.comment ? `<p class="text-sm mt-1">${escHtml(r.comment)}</p>` : ''}
+            </div>
+        `).join('');
+    }
+
+    document.getElementById('review-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const rating = parseInt(document.getElementById('rating').value);
+        if (rating < 1) { showAlert('msg', 'Please select a rating', 'error'); return; }
+
+        const btn = document.getElementById('submit-btn');
+        btn.disabled = true;
+        const res = await fetchJson('POST', '/api/reviews', {
+            bookingId: parseInt(bookingId),
+            rating,
+            comment: document.getElementById('comment').value
+        });
+        if (res.ok) {
+            showAlert('msg', 'Review submitted successfully!', 'success');
+            setTimeout(() => window.location.href = '/bookings.html', 1500);
+        } else {
+            showAlert('msg', res.data?.error || 'Failed to submit review', 'error');
+            btn.disabled = false;
+        }
+    });
+
+    function escHtml(str) { if (!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>

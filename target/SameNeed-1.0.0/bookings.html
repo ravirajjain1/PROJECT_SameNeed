@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookings — SameNeed</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="navbar" id="navbar"></nav>
+<div class="container">
+    <div class="page-header">
+        <h1>My Bookings</h1>
+        <p>View and manage all your service bookings.</p>
+    </div>
+    <div id="msg" class="alert" style="display:none"></div>
+    <div class="card">
+        <div class="table-wrapper">
+            <div id="bookings-table"><div class="loading">Loading bookings…</div></div>
+        </div>
+    </div>
+</div>
+<script src="/js/api.js"></script>
+<script>
+    const session = requireAuth();
+    if (session) {
+        buildNavbar('navbar');
+        loadBookings();
+    }
+
+    async function loadBookings() {
+        const res = await fetchJson('GET', '/api/bookings');
+        const el = document.getElementById('bookings-table');
+        if (!res.ok || !res.data || res.data.length === 0) {
+            el.innerHTML = '<div class="empty-state"><strong>No bookings yet</strong><p>Bookings appear here once a provider confirms a service.</p></div>';
+            return;
+        }
+        const rows = res.data.map(b => `
+            <tr>
+                <td><a href="/booking-detail.html?id=${b.bookingId}">#${b.bookingId}</a></td>
+                <td>${escHtml(b.serviceName)}</td>
+                <td>${escHtml(b.providerName)}</td>
+                <td>${escHtml(b.locality)}</td>
+                <td>${b.scheduledDate || '—'} ${b.scheduledTime ? b.scheduledTime.substring(0,5) : ''}</td>
+                <td>${statusBadge(b.status)}</td>
+                <td>
+                    <a href="/booking-detail.html?id=${b.bookingId}" class="btn btn-ghost btn-sm">View</a>
+                    ${b.status === 'COMPLETED' ? `<a href="/reviews.html?bookingId=${b.bookingId}&providerId=${b.providerId}" class="btn btn-outline btn-sm">Review</a>` : ''}
+                    ${session.role === 'SERVICE_PROVIDER' && b.status === 'CONFIRMED' ? `<button class="btn btn-success btn-sm" onclick="startService(${b.bookingId})">Start Service</button>` : ''}
+                    ${session.role === 'SERVICE_PROVIDER' && b.status === 'IN_PROGRESS' ? `<button class="btn btn-primary btn-sm" onclick="completeService(${b.bookingId})">Mark Complete</button>` : ''}
+                </td>
+            </tr>
+        `).join('');
+        el.innerHTML = `
+            <table>
+                <thead><tr><th>ID</th><th>Service</th><th>Provider</th><th>Locality</th><th>Scheduled</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>${rows}</tbody>
+            </table>
+        `;
+    }
+
+    async function startService(bookingId) {
+        const res = await fetchJson('PUT', `/api/bookings/${bookingId}`, { status: 'IN_PROGRESS' });
+        if (res.ok) location.reload();
+        else showAlert('msg', res.data?.error || 'Failed to update', 'error');
+    }
+
+    async function completeService(bookingId) {
+        if (!confirm('Mark this service as completed?')) return;
+        const res = await fetchJson('PUT', `/api/bookings/${bookingId}`, { status: 'COMPLETED' });
+        if (res.ok) location.reload();
+        else showAlert('msg', res.data?.error || 'Failed to update', 'error');
+    }
+
+    function escHtml(str) { if (!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>

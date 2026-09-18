@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Reports — SameNeed Admin</title>
+    <meta name="description" content="Admin panel for reviewing and resolving user reports on SameNeed.">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="navbar" id="navbar"></nav>
+<div class="container">
+    <div class="page-header flex-between">
+        <div>
+            <h1>Reports</h1>
+            <p>Review open reports and take action to resolve or dismiss them.</p>
+        </div>
+        <a href="/admin/index.html" class="btn btn-ghost btn-sm">← Dashboard</a>
+    </div>
+    <div id="msg" class="alert" style="display:none"></div>
+    <div class="card">
+        <div class="table-wrapper">
+            <div id="reports-table"><div class="loading">Loading reports…</div></div>
+        </div>
+    </div>
+</div>
+<script src="/js/api.js"></script>
+<script src="/js/admin.js"></script>
+<script>
+    const session = requireAuth(['ADMIN']);
+    if (session) {
+        buildNavbar('navbar');
+        loadReportsTable('reports-table');
+    }
+</script>
+</body>
+</html>

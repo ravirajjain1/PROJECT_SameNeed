@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entity Meta Explorer — SameNeed Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="navbar" id="navbar"></nav>
+<div class="container" style="max-width:750px">
+    <div class="page-header flex-between">
+        <div>
+            <h1>Entity Meta Explorer</h1>
+            <p>Inspect model class fields using Java Reflection API.</p>
+        </div>
+        <a href="/admin/index.html" class="btn btn-ghost btn-sm">← Dashboard</a>
+    </div>
+    <div class="alert alert-info mb-2">
+        This tool uses <strong>Class.forName()</strong> and <strong>getDeclaredFields()</strong> to inspect entity classes at runtime — demonstrating Java Reflection.
+    </div>
+    <div id="meta-container"><div class="loading">Loading entity list…</div></div>
+</div>
+<script src="/js/api.js"></script>
+<script src="/js/admin.js"></script>
+<script>
+    const session = requireAuth(['ADMIN']);
+    if (session) { buildNavbar('navbar'); loadMetaExplorer('meta-container'); }
+</script>
+</body>
+</html>

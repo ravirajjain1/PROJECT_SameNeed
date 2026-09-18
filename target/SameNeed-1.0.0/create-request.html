@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Request — SameNeed</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="navbar" id="navbar"></nav>
+<div class="container">
+    <div class="page-header">
+        <h1>Create Service Request</h1>
+        <p>Describe what you need. Others with the same service need can join your group.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+        <div>
+            <div class="card">
+                <div id="msg" class="alert" style="display:none"></div>
+                <form id="create-form">
+                    <div class="form-group">
+                        <label class="form-label" for="categoryId">Service Category</label>
+                        <select class="form-control" id="categoryId" required><option value="">Select Category</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="serviceId">Service</label>
+                        <select class="form-control" id="serviceId" required><option value="">Select Service</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="problemDescription">Describe Your Problem</label>
+                        <textarea class="form-control" id="problemDescription" placeholder="Explain what's wrong or what you need done…" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="locality">Locality / Area</label>
+                        <input class="form-control" id="locality" type="text" placeholder="e.g. Koregaon Park" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="preferredDate">Preferred Date</label>
+                            <input class="form-control" id="preferredDate" type="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="preferredTime">Preferred Time</label>
+                            <input class="form-control" id="preferredTime" type="time" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="budgetExpectation">Expected Budget (₹)</label>
+                            <input class="form-control" id="budgetExpectation" type="number" min="0" placeholder="Optional">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="maxGroupSize">Max Group Size</label>
+                            <select class="form-control" id="maxGroupSize">
+                                <option value="2">2 members</option>
+                                <option value="5">5 members</option>
+                                <option value="10" selected>10 members</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary full-width" type="submit" id="submit-btn">Create Request</button>
+                </form>
+            </div>
+        </div>
+        <div>
+            <div class="card" id="match-preview">
+                <div class="card-title">Compatible Groups</div>
+                <p class="text-muted text-sm">Select a service, locality, and date to see if there are existing groups you can join instead.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/api.js"></script>
+<script src="/js/requests.js"></script>
+<script>
+    const session = requireAuth(['CUSTOMER']);
+    if (session) {
+        buildNavbar('navbar');
+        loadCategories();
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('preferredDate').min = today;
+
+        ['serviceId', 'locality', 'preferredDate'].forEach(id => {
+            document.getElementById(id).addEventListener('change', checkForMatches);
+        });
+    }
+
+    async function checkForMatches() {
+        const serviceId = document.getElementById('serviceId').value;
+        const locality = document.getElementById('locality').value;
+        const date = document.getElementById('preferredDate').value;
+        if (serviceId && locality && date) {
+            loadMatchingRequests(serviceId, locality, date, 'match-preview');
+        }
+    }
+
+    document.getElementById('create-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        hideAlert('msg');
+        const btn = document.getElementById('submit-btn');
+        btn.disabled = true;
+        btn.textContent = 'Creating…';
+
+        const body = {
+            serviceId: parseInt(document.getElementById('serviceId').value),
+            problemDescription: document.getElementById('problemDescription').value,
+            locality: document.getElementById('locality').value,
+            preferredDate: document.getElementById('preferredDate').value,
+            preferredTime: document.getElementById('preferredTime').value,
+            budgetExpectation: document.getElementById('budgetExpectation').value || null,
+            maxGroupSize: parseInt(document.getElementById('maxGroupSize').value)
+        };
+
+        const res = await fetchJson('POST', '/api/requests', body);
+        if (res.ok) {
+            window.location.href = '/request-detail.html?id=' + res.data.requestId;
+        } else {
+            showAlert('msg', res.data?.error || 'Failed to create request', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Create Request';
+        }
+    });
+</script>
+</body>
+</html>

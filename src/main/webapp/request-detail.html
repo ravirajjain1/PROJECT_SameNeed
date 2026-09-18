@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Details — SameNeed</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="navbar" id="navbar"></nav>
+<div class="container">
+    <div id="msg" class="alert" style="display:none"></div>
+    <div id="offer-msg" class="alert" style="display:none"></div>
+
+    <div id="request-header" class="page-header flex-between">
+        <div><div class="loading">Loading…</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem">
+        <div>
+            <div class="card mb-2" id="request-info"></div>
+
+            <div class="card mb-2">
+                <div class="card-title flex-between">
+                    <span>Group Members</span>
+                    <span id="member-count" class="text-muted text-sm"></span>
+                </div>
+                <div class="member-list" id="members-list"></div>
+                <div id="join-section"></div>
+            </div>
+
+            <div class="card mb-2" id="offers-section">
+                <div class="card-title">Offers & Negotiation</div>
+                <div id="offers-container"></div>
+            </div>
+
+            <div class="card" id="chat-section">
+                <div class="card-title flex-between">
+                    <span>Group Chat</span>
+                    <span id="chat-status" class="text-muted text-sm">Connecting…</span>
+                </div>
+                <div class="chat-box">
+                    <div class="chat-messages" id="chat-messages"></div>
+                    <form class="chat-input-row" id="chat-form">
+                        <input type="text" id="chat-input" placeholder="Type a message…" autocomplete="off">
+                        <button type="submit" class="btn btn-primary btn-sm">Send</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="card mb-2" id="status-actions">
+                <div class="card-title">Request Status</div>
+                <div id="status-display"></div>
+            </div>
+            <div class="card" id="request-meta"></div>
+        </div>
+    </div>
+</div>
+<script src="/js/api.js"></script>
+<script src="/js/group.js"></script>
+<script src="/js/offers.js"></script>
+<script>
+    const session = requireAuth();
+    const requestId = getParam('id');
+
+    if (!requestId) { window.location.href = '/requests.html'; }
+
+    if (session) {
+        buildNavbar('navbar');
+        loadPage();
+    }
+
+    async function loadPage() {
+        const res = await fetchJson('GET', `/api/requests/${requestId}`);
+        if (!res.ok) { showAlert('msg', 'Request not found', 'error'); return; }
+        const req = res.data;
+
+        document.title = req.serviceName + ' — SameNeed';
+        document.getElementById('request-header').innerHTML = `
+            <div>
+                <h1>${escHtml(req.serviceName)}</h1>
+                <p>${escHtml(req.categoryName)} &bull; ${escHtml(req.locality)}</p>
+            </div>
+            <div>${statusBadge(req.status)}</div>
+        `;
+
+        document.getElementById('request-info').innerHTML = `
+            <div class="card-title">Request Details</div>
+            <p class="mb-2"><strong>Problem:</strong> ${escHtml(req.problemDescription)}</p>
+            <div class="form-row">
+                <div><strong>Date:</strong> ${req.preferredDate}</div>
+                <div><strong>Time:</strong> ${req.preferredTime ? req.preferredTime.substring(0,5) : '—'}</div>
+                <div><strong>Budget:</strong> ${req.budgetExpectation ? '₹' + req.budgetExpectation : 'Not specified'}</div>
+                <div><strong>Posted by:</strong> Group Creator</div>
+            </div>
+        `;
+
+        document.getElementById('request-meta').innerHTML = `
+            <div class="card-title">Group Info</div>
+            <div class="text-sm"><strong>Members:</strong> ${req.currentMemberCount} / ${req.maxGroupSize}</div>
+            <div class="text-sm mt-1"><strong>Created:</strong> ${formatDateTime(req.createdAt)}</div>
+        `;
+
+        await loadMembers(req);
+        await loadOffers(req);
+    }
+
+    async function loadMembers(req) {
+        const memRes = await fetchJson('GET', `/api/members?requestId=${requestId}`);
+        const members = memRes.ok ? memRes.data : [];
+
+        renderMembers(members, 'members-list');
+        document.getElementById('member-count').textContent = `${members.length} / ${req.maxGroupSize}`;
+
+        const myMember = members.find(m => m.userId === session.userId);
+        const isCreator = req.creatorId === session.userId;
+        const joinSection = document.getElementById('join-section');
+
+        if (session.role === 'CUSTOMER') {
+            if (myMember) {
+                document.getElementById('chat-section').style.display = 'block';
+                loadChatHistory(requestId);
+                initChat(requestId, myMember.anonymousAlias);
+
+                if (!isCreator) {
+                    joinSection.innerHTML = `<button class="btn btn-ghost btn-sm" onclick="leaveGroup()">Leave Group</button>`;
+                } else {
+                    renderStatusActions(req);
+                }
+            } else if (req.status === 'REQUESTED' || req.status === 'GROUP_FORMING') {
+                joinSection.innerHTML = `<button class="btn btn-primary" onclick="joinGroup()">Join This Group</button>`;
+                document.getElementById('chat-section').style.display = 'none';
+            } else {
+                document.getElementById('chat-section').style.display = 'none';
+            }
+        } else {
+            document.getElementById('chat-section').style.display = 'none';
+        }
+    }
+
+    async function loadOffers(req) {
+        if (session.role === 'CUSTOMER' || session.role === 'SERVICE_PROVIDER') {
+            await loadOffersForRequest(requestId, 'offers-container', session);
+        }
+        if (session.role === 'SERVICE_PROVIDER' && (req.status === 'GROUP_FORMING' || req.status === 'PROVIDER_CONTACTED')) {
+            document.getElementById('offers-section').innerHTML += `
+                <div class="card mt-2" id="submit-offer-form">
+                    <div class="card-title">Submit Offer</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Amount per Member (₹)</label>
+                            <input class="form-control" id="offer-amount" type="number" min="1" placeholder="e.g. 800">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Min Members Required</label>
+                            <input class="form-control" id="offer-members" type="number" min="1" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Valid For (hours)</label>
+                            <input class="form-control" id="offer-hours" type="number" min="1" max="72" value="24">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="submitOffer()">Send Offer to Group</button>
+                </div>
+            `;
+        }
+    }
+
+    function renderStatusActions(req) {
+        const el = document.getElementById('status-display');
+        el.innerHTML = statusBadge(req.status);
+        if (req.status === 'GROUP_FORMING') {
+            el.innerHTML += `<button class="btn btn-outline btn-sm mt-2 full-width" onclick="updateStatus('PROVIDER_CONTACTED')">Find Service Provider</button>`;
+        }
+    }
+
+    async function joinGroup() {
+        const res = await fetchJson('POST', `/api/members/${requestId}`);
+        if (res.ok) { location.reload(); }
+        else showAlert('msg', res.data?.error || 'Failed to join', 'error');
+    }
+
+    async function leaveGroup() {
+        if (!confirm('Leave this group?')) return;
+        const res = await fetchJson('DELETE', `/api/members?requestId=${requestId}`);
+        if (res.ok) window.location.href = '/requests.html';
+        else showAlert('msg', res.data?.error || 'Failed to leave', 'error');
+    }
+
+    async function updateStatus(newStatus) {
+        const res = await fetchJson('PUT', `/api/requests/${requestId}`, { status: newStatus });
+        if (res.ok) location.reload();
+        else showAlert('msg', res.data?.error || 'Failed to update status', 'error');
+    }
+
+    async function submitOffer() {
+        const amount = document.getElementById('offer-amount').value;
+        const requiredMembers = document.getElementById('offer-members').value;
+        const validHours = document.getElementById('offer-hours').value;
+        const res = await fetchJson('POST', '/api/offers', {
+            requestId: parseInt(requestId), amountPerMember: parseFloat(amount),
+            requiredMembers: parseInt(requiredMembers), validHours: parseInt(validHours)
+        });
+        if (res.ok) { showAlert('offer-msg', 'Offer submitted!', 'success'); location.reload(); }
+        else showAlert('offer-msg', res.data?.error || 'Failed to submit offer', 'error');
+    }
+
+    function escHtml(str) { if (!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>
